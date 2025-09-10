@@ -9,8 +9,8 @@ import Link from "next/link";
 
 export default function Contato() {
   return (
-    <section className="min-h-screen flex items-center justify-center py-16 mt-8">
-      <div className="w-full max-w-2xl mx-auto px-6 xl:px-0">
+    <section className="min-h-screen w-full max-w-5xl mx-auto px-6 py-16 mt-12">
+      <div className="w-full max-w-1xl mx-auto px-6 xl:px-0">
         <h1 className="mt-3 text-3xl md:text-4xl font-semibold tracking-tight text-primary text-center">
           Fale com nossa equipe!
         </h1>

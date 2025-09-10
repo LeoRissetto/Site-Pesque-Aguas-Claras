@@ -5,7 +5,7 @@ import { Footer } from "@/components/footer";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function RootLayout({ children }) {
+// Component that uses useSearchParams
+function ScrollToTop() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -25,12 +26,14 @@ export default function RootLayout({ children }) {
     window.scrollTo(0, 0);
   }, [pathname, searchParams]);
 
+  return null;
+}
+
+export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">
       <head>
-        <title>
-          Pesque Pague Águas Claras
-        </title>
+        <title>Pesque Pague Águas Claras</title>
         <meta
           name="description"
           content="Seu destino perfeito para lazer, pesca e contato com a natureza em Campina Grande do Sul. Oferecemos piscinas naturais, churrasqueiras, playground e estrutura completa para toda a família."
@@ -58,7 +61,12 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navigation />
-        <main>{children}</main>
+        <main>
+          <Suspense fallback={null}>
+            <ScrollToTop />
+          </Suspense>
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

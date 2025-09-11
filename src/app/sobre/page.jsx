@@ -9,7 +9,7 @@ import {
 
 export default function Sobre() {
   return (
-    <section className="min-h-screen w-full max-w-5xl mx-auto px-6 py-16 mt-12">
+    <section className="min-h-screen w-full max-w-5xl mx-auto px-6 py-16 mt-8">
       <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-primary text-center">
         Sobre o Pesque Pague Águas Claras
       </h1>

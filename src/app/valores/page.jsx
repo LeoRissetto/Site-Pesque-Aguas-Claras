@@ -24,9 +24,13 @@ export const metadata = {
 export default function ValoresPage() {
   return (
     <main className="container mx-auto px-4 py-20 max-w-6xl">
-      <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-primary text-center mb-12 mt-8">
+      <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-primary text-center mb-4 mt-3">
         Valores
       </h1>
+      <p className="mt-3 text-base sm:text-lg text-muted-foreground text-center mb-12">
+        Confira nossos preços acessíveis para toda a família, com opções para
+        todos os gostos e bolsos.
+      </p>
 
       {/* Entrada */}
       <section className="mb-16">

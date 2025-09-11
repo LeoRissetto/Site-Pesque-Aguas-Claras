@@ -42,7 +42,7 @@ export default function Galeria() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-muted-foreground mt-12">
+      <section className="mt-15 py-8 bg-gradient-to-r from-primary to-muted-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center text-white">
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
@@ -73,7 +73,7 @@ export default function Galeria() {
       </section>
 
       {/* Gallery Grid */}
-      <section className="py-20">
+      <section className="py-2">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
             {filteredImages.map((image, index) => (

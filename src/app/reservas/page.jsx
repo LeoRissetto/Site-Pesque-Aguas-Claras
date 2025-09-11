@@ -120,9 +120,13 @@ const Reservas = () => {
 
   return (
     <div className="container mt-12 mx-auto py-16 px-4">
-      <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-primary text-center mb-12">
+      <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-primary text-center mb-4">
         Reservas de Churrasqueiras
       </h1>
+      <p className="mt-3 text-base sm:text-lg text-muted-foreground text-center mb-12">
+        Planeje seu churrasco conosco! Reserve uma churrasqueira e aproveite um
+        dia especial com família e amigos em meio à natureza.
+      </p>
 
       <Tabs value={etapa} className="w-full max-w-4xl mx-auto">
         <TabsList className="grid w-full grid-cols-3 h-auto">

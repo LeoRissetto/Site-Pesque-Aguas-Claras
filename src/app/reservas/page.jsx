@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,50 +15,57 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-// Dados mockados de churrasqueiras (em produção, viriam do backend)
-const churrasqueirasDisponiveis = [
-  {
-    id: 1,
-    nome: "Churrasqueira 1",
-    capacidade: "10 pessoas",
-    valor: 150,
-  },
-  {
-    id: 2,
-    nome: "Churrasqueira 2",
-    capacidade: "15 pessoas",
-    valor: 200,
-  },
-  {
-    id: 3,
-    nome: "Churrasqueira 3",
-    capacidade: "8 pessoas",
-    valor: 120,
-  },
-  {
-    id: 4,
-    nome: "Churrasqueira 4",
-    capacidade: "20 pessoas",
-    valor: 250,
-  },
-];
+import { churrasqueirasApi, reservasApi } from "@/lib/api";
 
 const Reservas = () => {
   const [date, setDate] = useState(null);
   const [etapa, setEtapa] = useState("data"); // "data", "churrasqueira", "formulario", "confirmacao"
-  const [churrasqueiraSelecionada, setChurrasqueiraSelecionada] =
-    useState(null);
+  const [churrasqueiraSelecionada, setChurrasqueiraSelecionada] = useState(null);
+  const [churrasqueirasDisponiveis, setChurrasqueirasDisponiveis] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nome: "",
     cpf: "",
     telefone: "",
     email: "",
+    pessoas: "",
+    observacoes: ""
   });
   const [reservaCompleta, setReservaCompleta] = useState(false);
 
+  useEffect(() => {
+    fetchChurrasqueiras();
+  }, []);
+
+  const fetchChurrasqueiras = async () => {
+    try {
+      const data = await churrasqueirasApi.getAll();
+      // Filtrar apenas churrasqueiras disponíveis
+      const disponiveis = data.filter(c => c.disponivel);
+      setChurrasqueirasDisponiveis(disponiveis);
+    } catch (error) {
+      console.error('Erro ao carregar churrasqueiras:', error);
+    }
+  };
+
+  const fetchChurrasqueirasDisponiveis = async (selectedDate) => {
+    try {
+      setLoading(true);
+      const dateString = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
+      const data = await churrasqueirasApi.getAvailable(dateString);
+      setChurrasqueirasDisponiveis(data);
+    } catch (error) {
+      console.error('Erro ao carregar churrasqueiras disponíveis:', error);
+      alert('Erro ao carregar churrasqueiras disponíveis para esta data.');
+      setChurrasqueirasDisponiveis([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSelectDate = (selectedDate) => {
     setDate(selectedDate);
+    fetchChurrasqueirasDisponiveis(selectedDate);
     setEtapa("churrasqueira");
   };
 
@@ -75,16 +82,56 @@ const Reservas = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aqui seria feita a integração com o backend
-    console.log("Dados da reserva:", {
-      date,
-      churrasqueiraSelecionada,
-      formData,
-    });
-    setReservaCompleta(true);
-    setEtapa("confirmacao");
+    
+    if (!formData.nome || !formData.email || !formData.pessoas || !formData.cpf || !formData.telefone) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Verificar novamente se a churrasqueira ainda está disponível
+      const dateString = date.toISOString().split('T')[0];
+      const churrasqueirasDisponiveis = await churrasqueirasApi.getAvailable(dateString);
+      const churrasqueiraAindaDisponivel = churrasqueirasDisponiveis.find(
+        c => c.id === churrasqueiraSelecionada.id
+      );
+
+      if (!churrasqueiraAindaDisponivel) {
+        alert('Esta churrasqueira não está mais disponível para a data selecionada. Por favor, escolha outra.');
+        setEtapa("churrasqueira");
+        await fetchChurrasqueirasDisponiveis(date);
+        return;
+      }
+
+      await reservasApi.create({
+        nome: formData.nome,
+        email: formData.email,
+        telefone: formData.telefone,
+        cpf: formData.cpf,
+        data: dateString,
+        churrasqueiraId: churrasqueiraSelecionada.id,
+        pessoas: parseInt(formData.pessoas),
+        observacoes: formData.observacoes
+      });
+
+      setReservaCompleta(true);
+      setEtapa("confirmacao");
+    } catch (error) {
+      console.error('Erro:', error);
+      if (error.message.includes('409') || error.message.includes('Conflict')) {
+        alert('Esta churrasqueira já foi reservada por outra pessoa. Por favor, escolha outra churrasqueira.');
+        setEtapa("churrasqueira");
+        await fetchChurrasqueirasDisponiveis(date);
+      } else {
+        alert('Erro ao fazer reserva. Tente novamente.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const voltarParaData = () => {
@@ -92,8 +139,12 @@ const Reservas = () => {
     setChurrasqueiraSelecionada(null);
   };
 
-  const voltarParaChurrasqueira = () => {
+  const voltarParaChurrasqueira = async () => {
     setEtapa("churrasqueira");
+    // Atualizar lista de churrasqueiras disponíveis ao voltar
+    if (date) {
+      await fetchChurrasqueirasDisponiveis(date);
+    }
   };
 
   const formatarData = (data) => {
@@ -113,6 +164,8 @@ const Reservas = () => {
       cpf: "",
       telefone: "",
       email: "",
+      pessoas: "",
+      observacoes: ""
     });
     setReservaCompleta(false);
     setEtapa("data");
@@ -197,11 +250,25 @@ const Reservas = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <span className="ml-2">Carregando churrasqueiras disponíveis...</span>
+                </div>
+              ) : churrasqueirasDisponiveis.length === 0 ? (
+                <Alert>
+                  <AlertTitle>Nenhuma churrasqueira disponível</AlertTitle>
+                  <AlertDescription>
+                    Não há churrasqueiras disponíveis para a data {formatarData(date)}. 
+                    Por favor, escolha outra data.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {churrasqueirasDisponiveis.map((churrasqueira) => (
                   <Card
                     key={churrasqueira.id}
-                    className={`cursor-pointer transition-all ${
+                    className={`cursor-pointer transition-all hover:shadow-md ${
                       churrasqueiraSelecionada?.id === churrasqueira.id
                         ? "ring-2 ring-primary"
                         : ""
@@ -213,14 +280,19 @@ const Reservas = () => {
                         {churrasqueira.nome}
                       </CardTitle>
                       <CardDescription className="text-base">
-                        Capacidade: {churrasqueira.capacidade}
+                        Capacidade: {churrasqueira.capacidade} pessoas
                       </CardDescription>
+                      {churrasqueira.descricao && (
+                        <p className="text-sm text-gray-600">
+                          {churrasqueira.descricao}
+                        </p>
+                      )}
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-center justify-between">
                         <div className="text-right">
-                          <p className="font-bold text-base">
-                            R$ {churrasqueira.valor.toFixed(2)}
+                          <p className="font-bold text-lg">
+                            R$ {churrasqueira.preco.toFixed(2)}
                           </p>
                           <p className="text-sm text-gray-500">por dia</p>
                         </div>
@@ -228,7 +300,8 @@ const Reservas = () => {
                     </CardContent>
                   </Card>
                 ))}
-              </div>
+                </div>
+              )}
             </CardContent>
             <CardFooter className="flex justify-between">
               <Button variant="outline" onClick={voltarParaData}>
@@ -254,51 +327,72 @@ const Reservas = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nome" className="text-base">
-                    Nome completo
-                  </Label>
-                  <Input
-                    id="nome"
-                    name="nome"
-                    placeholder="Digite seu nome completo"
-                    required
-                    value={formData.nome}
-                    onChange={handleInputChange}
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="nome" className="text-base">
+                      Nome completo *
+                    </Label>
+                    <Input
+                      id="nome"
+                      name="nome"
+                      placeholder="Digite seu nome completo"
+                      required
+                      value={formData.nome}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pessoas" className="text-base">
+                      Número de pessoas *
+                    </Label>
+                    <Input
+                      id="pessoas"
+                      name="pessoas"
+                      type="number"
+                      min="1"
+                      max={churrasqueiraSelecionada?.capacidade}
+                      placeholder="Ex: 8"
+                      required
+                      value={formData.pessoas}
+                      onChange={handleInputChange}
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cpf" className="text-base">
-                    CPF
-                  </Label>
-                  <Input
-                    id="cpf"
-                    name="cpf"
-                    placeholder="000.000.000-00"
-                    required
-                    value={formData.cpf}
-                    onChange={handleInputChange}
-                  />
-                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="cpf" className="text-base">
+                      CPF *
+                    </Label>
+                    <Input
+                      id="cpf"
+                      name="cpf"
+                      placeholder="000.000.000-00"
+                      value={formData.cpf}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="telefone" className="text-base">
-                    Telefone
-                  </Label>
-                  <Input
-                    id="telefone"
-                    name="telefone"
-                    placeholder="(00) 00000-0000"
-                    required
-                    value={formData.telefone}
-                    onChange={handleInputChange}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="telefone" className="text-base">
+                      Telefone *
+                    </Label>
+                    <Input
+                      id="telefone"
+                      name="telefone"
+                      placeholder="(00) 00000-0000"
+                      required
+                      value={formData.telefone}
+                      onChange={handleInputChange}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-base">
-                    E-mail
+                    E-mail *
                   </Label>
                   <Input
                     id="email"
@@ -307,6 +401,19 @@ const Reservas = () => {
                     type="email"
                     required
                     value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="observacoes" className="text-base">
+                    Observações (opcional)
+                  </Label>
+                  <Input
+                    id="observacoes"
+                    name="observacoes"
+                    placeholder="Informações adicionais..."
+                    value={formData.observacoes}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -326,11 +433,11 @@ const Reservas = () => {
                   </p>
                   <p className="text-base">
                     <strong>Capacidade:</strong>{" "}
-                    {churrasqueiraSelecionada?.capacidade}
+                    {churrasqueiraSelecionada?.capacidade} pessoas
                   </p>
                   <p className="text-base">
                     <strong>Valor:</strong> R${" "}
-                    {churrasqueiraSelecionada?.valor.toFixed(2)}
+                    {churrasqueiraSelecionada?.preco?.toFixed(2)}
                   </p>
                 </div>
               </form>
@@ -339,7 +446,16 @@ const Reservas = () => {
               <Button variant="outline" onClick={voltarParaChurrasqueira}>
                 Voltar
               </Button>
-              <Button onClick={handleSubmit}>Finalizar Reserva</Button>
+              <Button onClick={handleSubmit} disabled={loading}>
+                {loading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Processando...</span>
+                  </div>
+                ) : (
+                  'Finalizar Reserva'
+                )}
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -376,8 +492,11 @@ const Reservas = () => {
                   {churrasqueiraSelecionada?.nome}
                 </p>
                 <p className="text-base">
+                  <strong>Pessoas:</strong> {formData.pessoas}
+                </p>
+                <p className="text-base">
                   <strong>Valor:</strong> R${" "}
-                  {churrasqueiraSelecionada?.valor.toFixed(2)}
+                  {churrasqueiraSelecionada?.preco?.toFixed(2)}
                 </p>
                 <p className="mt-4 text-sm">
                   Um comprovante foi enviado para {formData.email}

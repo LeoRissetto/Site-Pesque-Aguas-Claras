@@ -6,6 +6,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,9 @@ function ScrollToTop() {
 }
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith('/admin');
+
   return (
     <html lang="pt-BR">
       <head>
@@ -60,14 +64,16 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navigation />
-        <main>
-          <Suspense fallback={null}>
-            <ScrollToTop />
-          </Suspense>
-          {children}
-        </main>
-        <Footer />
+        <SessionProvider>
+          {!isAdminRoute && <Navigation />}
+          <main>
+            <Suspense fallback={null}>
+              <ScrollToTop />
+            </Suspense>
+            {children}
+          </main>
+          {!isAdminRoute && <Footer />}
+        </SessionProvider>
       </body>
     </html>
   );

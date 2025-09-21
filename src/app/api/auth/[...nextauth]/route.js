@@ -10,7 +10,8 @@ const handler = NextAuth({
         password: { label: 'Senha', type: 'password' }
       },
       async authorize(credentials) {
-        if (credentials?.username === 'admin' && credentials?.password === 'pesque2025') {
+        if (credentials?.username === process.env.ADMIN_USERNAME && 
+            credentials?.password === process.env.ADMIN_PASSWORD) {
           return {
             id: '1',
             name: 'Administrador',

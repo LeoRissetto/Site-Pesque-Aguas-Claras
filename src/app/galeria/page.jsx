@@ -22,13 +22,13 @@ export default function Galeria() {
     { src: "/images/prato1.jpg", category: "gastronomia" },
     { src: "/images/prato2.jpg", category: "gastronomia" },
     { src: "/images/prato3.jpg", category: "gastronomia" },
-    { src: "/images/prato4.jpg", category: "gastronomia" },
+    { src: "/images/prato4.jpg", category: "gastronomia" }
   ];
 
   // Extrai categorias únicas
   const categories = [
     "todas",
-    ...Array.from(new Set(images.map((img) => img.category))),
+    ...Array.from(new Set(images.map((img) => img.category)))
   ];
 
   const [selectedCategory, setSelectedCategory] = useState("todas");

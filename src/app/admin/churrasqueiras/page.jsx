@@ -1,15 +1,21 @@
-'use client'
+"use client";
 
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import {
   FiPlus,
   FiEdit,
@@ -19,53 +25,53 @@ import {
   FiX,
   FiUsers,
   FiDollarSign
-} from 'react-icons/fi'
-import Link from 'next/link'
-import { churrasqueirasApi } from '@/lib/api'
+} from "react-icons/fi";
+import Link from "next/link";
+import { churrasqueirasApi } from "@/lib/api";
 
 export default function ChurrasqueirasAdmin() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [churrasqueiras, setChurrasqueiras] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [statusFilter, setStatusFilter] = useState('todas') // 'todas', 'disponiveis', 'indisponiveis'
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [churrasqueiras, setChurrasqueiras] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("todas"); // 'todas', 'disponiveis', 'indisponiveis'
   const [formData, setFormData] = useState({
-    nome: '',
-    descricao: '',
-    capacidade: '',
-    preco: '',
+    nome: "",
+    descricao: "",
+    capacidade: "",
+    preco: "",
     disponivel: true
-  })
+  });
 
   useEffect(() => {
-    if (status === 'loading') return
+    if (status === "loading") return;
     if (!session) {
-      router.push('/admin/login')
+      router.push("/admin/login");
     }
-  }, [session, status, router])
+  }, [session, status, router]);
 
   useEffect(() => {
     if (session) {
-      fetchChurrasqueiras()
+      fetchChurrasqueiras();
     }
-  }, [session])
+  }, [session]);
 
   const fetchChurrasqueiras = async () => {
     try {
-      const data = await churrasqueirasApi.getAll()
-      setChurrasqueiras(data)
+      const data = await churrasqueirasApi.getAll();
+      setChurrasqueiras(data);
     } catch (error) {
-      console.error('Erro ao carregar churrasqueiras:', error)
+      console.error("Erro ao carregar churrasqueiras:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     try {
       // Preparar dados convertendo strings para números
       const dataToSend = {
@@ -74,26 +80,26 @@ export default function ChurrasqueirasAdmin() {
         capacidade: parseInt(formData.capacidade) || null,
         preco: parseFloat(formData.preco) || null,
         disponivel: formData.disponivel
-      }
-      
-      console.log('Enviando dados:', dataToSend)
-      
+      };
+
+      console.log("Enviando dados:", dataToSend);
+
       if (editingId) {
-        await churrasqueirasApi.update(editingId, dataToSend)
+        await churrasqueirasApi.update(editingId, dataToSend);
       } else {
-        await churrasqueirasApi.create(dataToSend)
+        await churrasqueirasApi.create(dataToSend);
       }
 
-      await fetchChurrasqueiras()
-      resetForm()
-      console.log('Churrasqueira salva com sucesso!')
+      await fetchChurrasqueiras();
+      resetForm();
+      console.log("Churrasqueira salva com sucesso!");
     } catch (error) {
-      console.error('Erro completo:', error)
-      console.error('Mensagem do erro:', error.message)
-      console.error('Stack do erro:', error.stack)
-      alert(`Erro ao salvar churrasqueira: ${error.message}`)
+      console.error("Erro completo:", error);
+      console.error("Mensagem do erro:", error.message);
+      console.error("Stack do erro:", error.stack);
+      alert(`Erro ao salvar churrasqueira: ${error.message}`);
     }
-  }
+  };
 
   const handleEdit = (churrasqueira) => {
     setFormData({
@@ -102,48 +108,48 @@ export default function ChurrasqueirasAdmin() {
       capacidade: churrasqueira.capacidade.toString(),
       preco: churrasqueira.preco.toString(),
       disponivel: churrasqueira.disponivel
-    })
-    setEditingId(churrasqueira.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(churrasqueira.id);
+    setShowForm(true);
+  };
 
   const handleDelete = async (id) => {
-    if (confirm('Tem certeza que deseja excluir esta churrasqueira?')) {
+    if (confirm("Tem certeza que deseja excluir esta churrasqueira?")) {
       try {
-        await churrasqueirasApi.delete(id)
-        await fetchChurrasqueiras()
+        await churrasqueirasApi.delete(id);
+        await fetchChurrasqueiras();
       } catch (error) {
-        console.error('Erro ao excluir churrasqueira:', error)
-        alert('Erro ao excluir churrasqueira')
+        console.error("Erro ao excluir churrasqueira:", error);
+        alert("Erro ao excluir churrasqueira");
       }
     }
-  }
+  };
 
   const resetForm = () => {
     setFormData({
-      nome: '',
-      descricao: '',
-      capacidade: '',
-      preco: '',
+      nome: "",
+      descricao: "",
+      capacidade: "",
+      preco: "",
       disponivel: true
-    })
-    setEditingId(null)
-    setShowForm(false)
-  }
+    });
+    setEditingId(null);
+    setShowForm(false);
+  };
 
   // Filtrar churrasqueiras baseado no status selecionado
-  const filteredChurrasqueiras = churrasqueiras.filter(churrasqueira => {
+  const filteredChurrasqueiras = churrasqueiras.filter((churrasqueira) => {
     switch (statusFilter) {
-      case 'disponiveis':
-        return churrasqueira.disponivel === true
-      case 'indisponiveis':
-        return churrasqueira.disponivel === false
+      case "disponiveis":
+        return churrasqueira.disponivel === true;
+      case "indisponiveis":
+        return churrasqueira.disponivel === false;
       default:
-        return true
+        return true;
     }
-  })
+  });
 
-  if (status === 'loading' || loading) {
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -151,10 +157,10 @@ export default function ChurrasqueirasAdmin() {
           <p className="text-gray-600">Carregando...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!session) return null
+  if (!session) return null;
 
   return (
     <section className="min-h-screen w-full max-w-7xl mx-auto px-6 py-16">
@@ -172,7 +178,8 @@ export default function ChurrasqueirasAdmin() {
               Gerenciar Churrasqueiras
             </h1>
             <p className="mt-1 text-base text-muted-foreground">
-              Total: {churrasqueiras.length} churrasqueiras | Exibindo: {filteredChurrasqueiras.length}
+              Total: {churrasqueiras.length} churrasqueiras | Exibindo:{" "}
+              {filteredChurrasqueiras.length}
             </p>
           </div>
         </div>
@@ -208,7 +215,7 @@ export default function ChurrasqueirasAdmin() {
           <CardContent className="p-6 md:p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">
-                {editingId ? 'Editar Churrasqueira' : 'Nova Churrasqueira'}
+                {editingId ? "Editar Churrasqueira" : "Nova Churrasqueira"}
               </h2>
               <Button variant="outline" onClick={resetForm}>
                 <FiX className="mr-2" />
@@ -219,34 +226,52 @@ export default function ChurrasqueirasAdmin() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="nome" className="text-base">Nome *</Label>
+                  <Label htmlFor="nome" className="text-base">
+                    Nome *
+                  </Label>
                   <Input
                     id="nome"
                     value={formData.nome}
-                    onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, nome: e.target.value }))
+                    }
                     className="mt-2 h-10 bg-white shadow-none"
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="capacidade" className="text-base">Capacidade (pessoas) *</Label>
+                  <Label htmlFor="capacidade" className="text-base">
+                    Capacidade (pessoas) *
+                  </Label>
                   <Input
                     id="capacidade"
                     type="number"
                     value={formData.capacidade}
-                    onChange={(e) => setFormData(prev => ({ ...prev, capacidade: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        capacidade: e.target.value
+                      }))
+                    }
                     className="mt-2 h-10 bg-white shadow-none"
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="preco" className="text-base">Preço (R$) *</Label>
+                  <Label htmlFor="preco" className="text-base">
+                    Preço (R$) *
+                  </Label>
                   <Input
                     id="preco"
                     type="number"
                     step="0.01"
                     value={formData.preco}
-                    onChange={(e) => setFormData(prev => ({ ...prev, preco: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        preco: e.target.value
+                      }))
+                    }
                     className="mt-2 h-10 bg-white shadow-none"
                     required
                   />
@@ -254,11 +279,18 @@ export default function ChurrasqueirasAdmin() {
               </div>
 
               <div>
-                <Label htmlFor="descricao" className="text-base">Descrição</Label>
+                <Label htmlFor="descricao" className="text-base">
+                  Descrição
+                </Label>
                 <Textarea
                   id="descricao"
                   value={formData.descricao}
-                  onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      descricao: e.target.value
+                    }))
+                  }
                   className="mt-2 bg-white shadow-none"
                   rows={3}
                 />
@@ -268,16 +300,20 @@ export default function ChurrasqueirasAdmin() {
                 <Checkbox
                   id="disponivel"
                   checked={formData.disponivel}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, disponivel: checked }))}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, disponivel: checked }))
+                  }
                   className="bg-background"
                 />
-                <Label htmlFor="disponivel" className="text-base">Disponível para reserva</Label>
+                <Label htmlFor="disponivel" className="text-base">
+                  Disponível para reserva
+                </Label>
               </div>
 
               <div className="flex space-x-4">
                 <Button type="submit">
                   <FiSave className="mr-2" />
-                  {editingId ? 'Atualizar' : 'Criar'}
+                  {editingId ? "Atualizar" : "Criar"}
                 </Button>
                 <Button type="button" variant="outline" onClick={resetForm}>
                   Cancelar
@@ -291,20 +327,21 @@ export default function ChurrasqueirasAdmin() {
       {/* Lista de Churrasqueiras */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredChurrasqueiras.map((churrasqueira) => (
-          <Card key={churrasqueira.id} className="shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+          <Card
+            key={churrasqueira.id}
+            className="shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+          >
             <CardContent className="p-6">
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold">
-                  {churrasqueira.nome}
-                </h3>
+                <h3 className="text-lg font-semibold">{churrasqueira.nome}</h3>
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
                     churrasqueira.disponivel
-                      ? 'bg-accent/20 text-accent-foreground'
-                      : 'bg-destructive/10 text-destructive'
+                      ? "bg-accent/20 text-accent-foreground"
+                      : "bg-destructive/10 text-destructive"
                   }`}
                 >
-                  {churrasqueira.disponivel ? 'Disponível' : 'Indisponível'}
+                  {churrasqueira.disponivel ? "Disponível" : "Indisponível"}
                 </span>
               </div>
 
@@ -315,7 +352,9 @@ export default function ChurrasqueirasAdmin() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center text-muted-foreground">
                   <FiUsers className="mr-1" />
-                  <span className="text-sm">{churrasqueira.capacidade} pessoas</span>
+                  <span className="text-sm">
+                    {churrasqueira.capacidade} pessoas
+                  </span>
                 </div>
                 <div className="flex items-center text-primary">
                   <FiDollarSign className="mr-1" />
@@ -381,5 +420,5 @@ export default function ChurrasqueirasAdmin() {
         </div>
       )}
     </section>
-  )
+  );
 }

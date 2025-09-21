@@ -4,7 +4,7 @@ import {
   MapPinIcon,
   Clock,
   UtensilsCrossed,
-  CreditCardIcon,
+  CreditCardIcon
 } from "lucide-react";
 
 export default function Sobre() {

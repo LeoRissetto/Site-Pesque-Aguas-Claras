@@ -12,7 +12,7 @@ export function Navigation() {
     { name: "Sobre", href: "/sobre" },
     { name: "Valores", href: "/valores" },
     { name: "Galeria", href: "/galeria" },
-    { name: "Contato", href: "/contato" },
+    { name: "Contato", href: "/contato" }
   ];
 
   // Function to close mobile menu

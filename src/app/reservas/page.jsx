@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,8 +20,11 @@ import { churrasqueirasApi, reservasApi } from "@/lib/api";
 const Reservas = () => {
   const [date, setDate] = useState(null);
   const [etapa, setEtapa] = useState("data"); // "data", "churrasqueira", "formulario", "confirmacao"
-  const [churrasqueiraSelecionada, setChurrasqueiraSelecionada] = useState(null);
-  const [churrasqueirasDisponiveis, setChurrasqueirasDisponiveis] = useState([]);
+  const [churrasqueiraSelecionada, setChurrasqueiraSelecionada] =
+    useState(null);
+  const [churrasqueirasDisponiveis, setChurrasqueirasDisponiveis] = useState(
+    []
+  );
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nome: "",
@@ -41,22 +44,22 @@ const Reservas = () => {
     try {
       const data = await churrasqueirasApi.getAll();
       // Filtrar apenas churrasqueiras disponíveis
-      const disponiveis = data.filter(c => c.disponivel);
+      const disponiveis = data.filter((c) => c.disponivel);
       setChurrasqueirasDisponiveis(disponiveis);
     } catch (error) {
-      console.error('Erro ao carregar churrasqueiras:', error);
+      console.error("Erro ao carregar churrasqueiras:", error);
     }
   };
 
   const fetchChurrasqueirasDisponiveis = async (selectedDate) => {
     try {
       setLoading(true);
-      const dateString = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
+      const dateString = selectedDate.toISOString().split("T")[0]; // YYYY-MM-DD
       const data = await churrasqueirasApi.getAvailable(dateString);
       setChurrasqueirasDisponiveis(data);
     } catch (error) {
-      console.error('Erro ao carregar churrasqueiras disponíveis:', error);
-      alert('Erro ao carregar churrasqueiras disponíveis para esta data.');
+      console.error("Erro ao carregar churrasqueiras disponíveis:", error);
+      alert("Erro ao carregar churrasqueiras disponíveis para esta data.");
       setChurrasqueirasDisponiveis([]);
     } finally {
       setLoading(false);
@@ -78,14 +81,20 @@ const Reservas = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: value
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!formData.nome || !formData.email || !formData.pessoas || !formData.cpf || !formData.telefone) {
+
+    if (
+      !formData.nome ||
+      !formData.email ||
+      !formData.pessoas ||
+      !formData.cpf ||
+      !formData.telefone
+    ) {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
@@ -94,14 +103,17 @@ const Reservas = () => {
 
     try {
       // Verificar novamente se a churrasqueira ainda está disponível
-      const dateString = date.toISOString().split('T')[0];
-      const churrasqueirasDisponiveis = await churrasqueirasApi.getAvailable(dateString);
+      const dateString = date.toISOString().split("T")[0];
+      const churrasqueirasDisponiveis =
+        await churrasqueirasApi.getAvailable(dateString);
       const churrasqueiraAindaDisponivel = churrasqueirasDisponiveis.find(
-        c => c.id === churrasqueiraSelecionada.id
+        (c) => c.id === churrasqueiraSelecionada.id
       );
 
       if (!churrasqueiraAindaDisponivel) {
-        alert('Esta churrasqueira não está mais disponível para a data selecionada. Por favor, escolha outra.');
+        alert(
+          "Esta churrasqueira não está mais disponível para a data selecionada. Por favor, escolha outra."
+        );
         setEtapa("churrasqueira");
         await fetchChurrasqueirasDisponiveis(date);
         return;
@@ -121,13 +133,15 @@ const Reservas = () => {
       setReservaCompleta(true);
       setEtapa("confirmacao");
     } catch (error) {
-      console.error('Erro:', error);
-      if (error.message.includes('409') || error.message.includes('Conflict')) {
-        alert('Esta churrasqueira já foi reservada por outra pessoa. Por favor, escolha outra churrasqueira.');
+      console.error("Erro:", error);
+      if (error.message.includes("409") || error.message.includes("Conflict")) {
+        alert(
+          "Esta churrasqueira já foi reservada por outra pessoa. Por favor, escolha outra churrasqueira."
+        );
         setEtapa("churrasqueira");
         await fetchChurrasqueirasDisponiveis(date);
       } else {
-        alert('Erro ao fazer reserva. Tente novamente.');
+        alert("Erro ao fazer reserva. Tente novamente.");
       }
     } finally {
       setLoading(false);
@@ -152,7 +166,7 @@ const Reservas = () => {
     return new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
       month: "2-digit",
-      year: "numeric",
+      year: "numeric"
     }).format(data);
   };
 
@@ -253,53 +267,55 @@ const Reservas = () => {
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <span className="ml-2">Carregando churrasqueiras disponíveis...</span>
+                  <span className="ml-2">
+                    Carregando churrasqueiras disponíveis...
+                  </span>
                 </div>
               ) : churrasqueirasDisponiveis.length === 0 ? (
                 <Alert>
                   <AlertTitle>Nenhuma churrasqueira disponível</AlertTitle>
                   <AlertDescription>
-                    Não há churrasqueiras disponíveis para a data {formatarData(date)}. 
-                    Por favor, escolha outra data.
+                    Não há churrasqueiras disponíveis para a data{" "}
+                    {formatarData(date)}. Por favor, escolha outra data.
                   </AlertDescription>
                 </Alert>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {churrasqueirasDisponiveis.map((churrasqueira) => (
-                  <Card
-                    key={churrasqueira.id}
-                    className={`cursor-pointer transition-all hover:shadow-md ${
-                      churrasqueiraSelecionada?.id === churrasqueira.id
-                        ? "ring-2 ring-primary"
-                        : ""
-                    }`}
-                    onClick={() => handleSelectChurrasqueira(churrasqueira)}
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        {churrasqueira.nome}
-                      </CardTitle>
-                      <CardDescription className="text-base">
-                        Capacidade: {churrasqueira.capacidade} pessoas
-                      </CardDescription>
-                      {churrasqueira.descricao && (
-                        <p className="text-sm text-gray-600">
-                          {churrasqueira.descricao}
-                        </p>
-                      )}
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
-                        <div className="text-right">
-                          <p className="font-bold text-lg">
-                            R$ {churrasqueira.preco.toFixed(2)}
+                  {churrasqueirasDisponiveis.map((churrasqueira) => (
+                    <Card
+                      key={churrasqueira.id}
+                      className={`cursor-pointer transition-all hover:shadow-md ${
+                        churrasqueiraSelecionada?.id === churrasqueira.id
+                          ? "ring-2 ring-primary"
+                          : ""
+                      }`}
+                      onClick={() => handleSelectChurrasqueira(churrasqueira)}
+                    >
+                      <CardHeader>
+                        <CardTitle className="text-lg">
+                          {churrasqueira.nome}
+                        </CardTitle>
+                        <CardDescription className="text-base">
+                          Capacidade: {churrasqueira.capacidade} pessoas
+                        </CardDescription>
+                        {churrasqueira.descricao && (
+                          <p className="text-sm text-gray-600">
+                            {churrasqueira.descricao}
                           </p>
-                          <p className="text-sm text-gray-500">por dia</p>
+                        )}
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center justify-between">
+                          <div className="text-right">
+                            <p className="font-bold text-lg">
+                              R$ {churrasqueira.preco.toFixed(2)}
+                            </p>
+                            <p className="text-sm text-gray-500">por dia</p>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               )}
             </CardContent>
@@ -453,7 +469,7 @@ const Reservas = () => {
                     <span>Processando...</span>
                   </div>
                 ) : (
-                  'Finalizar Reserva'
+                  "Finalizar Reserva"
                 )}
               </Button>
             </CardFooter>

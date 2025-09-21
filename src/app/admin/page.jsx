@@ -1,68 +1,68 @@
-'use client'
+"use client";
 
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { signOut } from 'next-auth/react'
-import { 
-  FiGrid, 
-  FiMessageSquare, 
-  FiCalendar, 
-  FiLogOut, 
-  FiUsers, 
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react";
+import {
+  FiGrid,
+  FiMessageSquare,
+  FiCalendar,
+  FiLogOut,
+  FiUsers,
   FiDollarSign,
   FiActivity
-} from 'react-icons/fi'
-import Link from 'next/link'
-import { statsApi } from '@/lib/api'
+} from "react-icons/fi";
+import Link from "next/link";
+import { statsApi } from "@/lib/api";
 
 export default function AdminDashboard() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [stats, setStats] = useState({
     churrasqueiras: 0,
     mensagens: 0,
     reservas: 0,
     mensagensNaoLidas: 0
-  })
+  });
 
   useEffect(() => {
-    if (status === 'loading') return
+    if (status === "loading") return;
     if (!session) {
-      router.push('/admin/login')
+      router.push("/admin/login");
     }
-  }, [session, status, router])
+  }, [session, status, router]);
 
   useEffect(() => {
     // Carregar estatísticas
     const fetchStats = async () => {
       try {
-        const data = await statsApi.getDashboardStats()
-        setStats(data)
+        const data = await statsApi.getDashboardStats();
+        setStats(data);
       } catch (error) {
-        console.error('Erro ao carregar estatísticas:', error)
+        console.error("Erro ao carregar estatísticas:", error);
         // Manter valores padrão em caso de erro
         setStats({
           churrasqueiras: 0,
           mensagens: 0,
           reservas: 0,
           mensagensNaoLidas: 0
-        })
+        });
       }
-    }
+    };
 
     if (session) {
-      fetchStats()
+      fetchStats();
     }
-  }, [session])
+  }, [session]);
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/admin/login' })
-  }
+    await signOut({ callbackUrl: "/admin/login" });
+  };
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -70,11 +70,11 @@ export default function AdminDashboard() {
           <p className="text-gray-600">Carregando...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!session) {
-    return null
+    return null;
   }
 
   return (
@@ -111,8 +111,12 @@ export default function AdminDashboard() {
         <Card className="shadow-sm border-l-4 border-l-primary">
           <CardContent className="flex items-center justify-between p-6">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">Churrasqueiras</p>
-              <p className="text-3xl font-bold text-primary">{stats.churrasqueiras}</p>
+              <p className="text-muted-foreground text-sm font-medium">
+                Churrasqueiras
+              </p>
+              <p className="text-3xl font-bold text-primary">
+                {stats.churrasqueiras}
+              </p>
             </div>
             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
               <FiGrid className="w-6 h-6 text-primary" />
@@ -123,8 +127,12 @@ export default function AdminDashboard() {
         <Card className="shadow-sm border-l-4 border-l-accent">
           <CardContent className="flex items-center justify-between p-6">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">Reservas</p>
-              <p className="text-3xl font-bold text-accent-foreground">{stats.reservas}</p>
+              <p className="text-muted-foreground text-sm font-medium">
+                Reservas
+              </p>
+              <p className="text-3xl font-bold text-accent-foreground">
+                {stats.reservas}
+              </p>
             </div>
             <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
               <FiCalendar className="w-6 h-6 text-accent-foreground" />
@@ -135,8 +143,12 @@ export default function AdminDashboard() {
         <Card className="shadow-sm border-l-4 border-l-secondary">
           <CardContent className="flex items-center justify-between p-6">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">Mensagens</p>
-              <p className="text-3xl font-bold text-secondary-foreground">{stats.mensagens}</p>
+              <p className="text-muted-foreground text-sm font-medium">
+                Mensagens
+              </p>
+              <p className="text-3xl font-bold text-secondary-foreground">
+                {stats.mensagens}
+              </p>
             </div>
             <div className="w-12 h-12 bg-secondary/20 rounded-full flex items-center justify-center">
               <FiMessageSquare className="w-6 h-6 text-secondary-foreground" />
@@ -147,8 +159,12 @@ export default function AdminDashboard() {
         <Card className="shadow-sm border-l-4 border-l-destructive">
           <CardContent className="flex items-center justify-between p-6">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">Não Lidas</p>
-              <p className="text-3xl font-bold text-destructive">{stats.mensagensNaoLidas}</p>
+              <p className="text-muted-foreground text-sm font-medium">
+                Não Lidas
+              </p>
+              <p className="text-3xl font-bold text-destructive">
+                {stats.mensagensNaoLidas}
+              </p>
             </div>
             <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center">
               <FiActivity className="w-6 h-6 text-destructive" />
@@ -171,9 +187,7 @@ export default function AdminDashboard() {
               Adicione, edite ou remova churrasqueiras disponíveis
             </p>
             <Link href="/admin/churrasqueiras">
-              <Button className="w-full">
-                Acessar
-              </Button>
+              <Button className="w-full">Acessar</Button>
             </Link>
           </CardContent>
         </Card>
@@ -183,16 +197,12 @@ export default function AdminDashboard() {
             <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiCalendar className="w-6 h-6 text-accent-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">
-              Reservas
-            </h3>
+            <h3 className="text-xl font-semibold mb-2">Reservas</h3>
             <p className="text-muted-foreground mb-6">
               Visualize e gerencie todas as reservas
             </p>
             <Link href="/admin/reservas">
-              <Button className="w-full">
-                Acessar
-              </Button>
+              <Button className="w-full">Acessar</Button>
             </Link>
           </CardContent>
         </Card>
@@ -202,20 +212,16 @@ export default function AdminDashboard() {
             <div className="w-12 h-12 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiMessageSquare className="w-6 h-6 text-secondary-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">
-              Mensagens
-            </h3>
+            <h3 className="text-xl font-semibold mb-2">Mensagens</h3>
             <p className="text-muted-foreground mb-6">
               Veja mensagens de contato dos visitantes
             </p>
             <Link href="/admin/mensagens">
-              <Button className="w-full">
-                Acessar
-              </Button>
+              <Button className="w-full">Acessar</Button>
             </Link>
           </CardContent>
         </Card>
       </div>
     </section>
-  )
+  );
 }

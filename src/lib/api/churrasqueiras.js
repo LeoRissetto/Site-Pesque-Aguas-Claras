@@ -1,9 +1,9 @@
-import { apiClient } from './client.js';
+import { apiClient } from "./client.js";
 
 export const churrasqueirasApi = {
   // Buscar todas as churrasqueiras
   async getAll() {
-    return await apiClient.get('/churrasqueiras');
+    return await apiClient.get("/churrasqueiras");
   },
 
   // Buscar churrasqueira por ID
@@ -13,7 +13,7 @@ export const churrasqueirasApi = {
 
   // Criar nova churrasqueira
   async create(data) {
-    return await apiClient.post('/churrasqueiras', data);
+    return await apiClient.post("/churrasqueiras", data);
   },
 
   // Atualizar churrasqueira

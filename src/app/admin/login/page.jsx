@@ -1,43 +1,46 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { signIn, getSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
-import { FiUser, FiLock, FiLogIn } from 'react-icons/fi'
+import { useState } from "react";
+import { signIn, getSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { FiUser, FiLock, FiLogIn } from "react-icons/fi";
 
 export default function AdminLogin() {
-  const [credentials, setCredentials] = useState({ username: '', password: '' })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const router = useRouter()
+  const [credentials, setCredentials] = useState({
+    username: "",
+    password: ""
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         username: credentials.username,
         password: credentials.password,
-        redirect: false,
-      })
+        redirect: false
+      });
 
       if (result?.error) {
-        setError('Credenciais inválidas. Verifique usuário e senha.')
+        setError("Credenciais inválidas. Verifique usuário e senha.");
       } else {
-        router.push('/admin')
+        router.push("/admin");
       }
     } catch (error) {
-      setError('Erro ao fazer login. Tente novamente.')
+      setError("Erro ao fazer login. Tente novamente.");
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <section className="min-h-screen w-full max-w-md mx-auto px-6 py-16 flex items-center justify-center">
@@ -64,7 +67,12 @@ export default function AdminLogin() {
                     id="username"
                     type="text"
                     value={credentials.username}
-                    onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
+                    onChange={(e) =>
+                      setCredentials((prev) => ({
+                        ...prev,
+                        username: e.target.value
+                      }))
+                    }
                     className="pl-10 h-10 bg-white shadow-none"
                     placeholder="Digite seu usuário"
                     required
@@ -82,7 +90,12 @@ export default function AdminLogin() {
                     id="password"
                     type="password"
                     value={credentials.password}
-                    onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
+                    onChange={(e) =>
+                      setCredentials((prev) => ({
+                        ...prev,
+                        password: e.target.value
+                      }))
+                    }
                     className="pl-10 h-10 bg-white shadow-none"
                     placeholder="Digite sua senha"
                     required
@@ -125,5 +138,5 @@ export default function AdminLogin() {
         </Card>
       </div>
     </section>
-  )
+  );
 }

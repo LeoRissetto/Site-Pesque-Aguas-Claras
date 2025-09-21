@@ -5,20 +5,20 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 
 export const metadata = {
   title: "Valores | Águas Claras",
   description:
-    "Conheça os valores de entrada, pescaria, comidas e bebidas do nosso pesqueiro.",
+    "Conheça os valores de entrada, pescaria, comidas e bebidas do nosso pesqueiro."
 };
 
 export default function ValoresPage() {

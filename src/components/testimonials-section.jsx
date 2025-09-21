@@ -7,20 +7,20 @@ export function TestimonialsSection() {
       name: "Karoline Gaspareto Andrade",
       location: "5 meses atrás",
       text: "Excelente ambiente familiar. Abre todos os dias do ano. R$15 por pessoa, livre churrasqueira e piscina familiar. Tem opção de camping também.",
-      rating: 5,
+      rating: 5
     },
     {
       name: "Abreu Junior",
       location: "3 anos atrás",
       text: "Excelente atendimento, estrutura incrível e preços super acessíveis. Uma experiência única para quem busca diversão em família. Parabéns a toda equipe, especialmente aos que trabalham com peixe.",
-      rating: 5,
+      rating: 5
     },
     {
       name: "José Luiz Veríssimo de Mattos",
       location: "11 meses atrás",
       text: "Local muito bonito, bem tratado e com preços excelentes. Vários quiosques com pia, churrasqueira e mesa, tudo gratuito. Parabéns aos donos e colaboradores por oferecer lazer acessível para todos.",
-      rating: 5,
-    },
+      rating: 5
+    }
   ];
 
   return (

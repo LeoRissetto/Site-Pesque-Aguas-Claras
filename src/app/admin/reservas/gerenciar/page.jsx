@@ -1,17 +1,40 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CheckCircle, XCircle, Clock, Calendar, MapPin, Phone, Mail, User, Edit, Trash2 } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  Calendar,
+  MapPin,
+  Phone,
+  Mail,
+  User,
+  Edit,
+  Trash2
+} from "lucide-react";
 
 export default function GerenciarReservas() {
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchReservas();
@@ -19,12 +42,12 @@ export default function GerenciarReservas() {
 
   const fetchReservas = async () => {
     try {
-      const response = await fetch('http://localhost:3001/reservas');
-      if (!response.ok) throw new Error('Erro ao carregar reservas');
+      const response = await fetch("http://localhost:3001/reservas");
+      if (!response.ok) throw new Error("Erro ao carregar reservas");
       const data = await response.json();
       setReservas(data);
     } catch (err) {
-      setError('Erro ao carregar reservas');
+      setError("Erro ao carregar reservas");
       console.error(err);
     } finally {
       setLoading(false);
@@ -34,15 +57,15 @@ export default function GerenciarReservas() {
   const handleStatusChange = async (id, newStatus) => {
     try {
       const response = await fetch(`http://localhost:3001/reservas/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({ status: newStatus.toLowerCase() }),
+        body: JSON.stringify({ status: newStatus.toLowerCase() })
       });
 
       if (!response.ok) throw new Error(`Erro ao alterar status da reserva`);
-      
+
       // Atualizar a lista de reservas
       await fetchReservas();
     } catch (err) {
@@ -52,18 +75,22 @@ export default function GerenciarReservas() {
   };
 
   const handleDeleteReserva = async (id) => {
-    if (confirm('Tem certeza que deseja excluir esta reserva? Esta ação não pode ser desfeita.')) {
+    if (
+      confirm(
+        "Tem certeza que deseja excluir esta reserva? Esta ação não pode ser desfeita."
+      )
+    ) {
       try {
         const response = await fetch(`http://localhost:3001/reservas/${id}`, {
-          method: 'DELETE',
+          method: "DELETE"
         });
 
-        if (!response.ok) throw new Error('Erro ao excluir reserva');
-        
+        if (!response.ok) throw new Error("Erro ao excluir reserva");
+
         // Atualizar a lista de reservas
         await fetchReservas();
       } catch (err) {
-        setError('Erro ao excluir reserva');
+        setError("Erro ao excluir reserva");
         console.error(err);
       }
     }
@@ -72,14 +99,26 @@ export default function GerenciarReservas() {
   const getStatusBadge = (status) => {
     // Normalizar para maiúsculo para compatibilidade
     const normalizedStatus = status?.toString().toUpperCase();
-    
+
     const statusConfig = {
-      'PENDENTE': { variant: 'secondary', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-      'CONFIRMADA': { variant: 'default', color: 'bg-green-100 text-green-800', icon: CheckCircle },
-      'CANCELADA': { variant: 'destructive', color: 'bg-red-100 text-red-800', icon: XCircle }
+      PENDENTE: {
+        variant: "secondary",
+        color: "bg-yellow-100 text-yellow-800",
+        icon: Clock
+      },
+      CONFIRMADA: {
+        variant: "default",
+        color: "bg-green-100 text-green-800",
+        icon: CheckCircle
+      },
+      CANCELADA: {
+        variant: "destructive",
+        color: "bg-red-100 text-red-800",
+        icon: XCircle
+      }
     };
 
-    const config = statusConfig[normalizedStatus] || statusConfig['PENDENTE'];
+    const config = statusConfig[normalizedStatus] || statusConfig["PENDENTE"];
     const IconComponent = config.icon;
 
     return (
@@ -91,13 +130,14 @@ export default function GerenciarReservas() {
   };
 
   const filterReservasByStatus = (status) => {
-    return reservas.filter(reserva => 
-      reserva.status?.toString().toUpperCase() === status.toUpperCase()
+    return reservas.filter(
+      (reserva) =>
+        reserva.status?.toString().toUpperCase() === status.toUpperCase()
     );
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+    return new Date(dateString).toLocaleDateString("pt-BR");
   };
 
   const ReservaCard = ({ reserva }) => (
@@ -112,15 +152,13 @@ export default function GerenciarReservas() {
             <CardDescription className="flex items-center gap-4 mt-2">
               <span className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
-                {reserva.churrasqueira?.nome || 'Churrasqueira N/A'}
+                {reserva.churrasqueira?.nome || "Churrasqueira N/A"}
               </span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {formatDate(reserva.data)}
               </span>
-              {reserva.horario && (
-                <span>às {reserva.horario}</span>
-              )}
+              {reserva.horario && <span>às {reserva.horario}</span>}
             </CardDescription>
           </div>
           {getStatusBadge(reserva.status)}
@@ -142,14 +180,18 @@ export default function GerenciarReservas() {
           <div>
             <p className="text-sm text-gray-600 mb-1">Detalhes</p>
             <p className="text-sm">CPF: {reserva.cpf}</p>
-            <p className="text-sm">Criada em: {formatDate(reserva.createdAt)}</p>
+            <p className="text-sm">
+              Criada em: {formatDate(reserva.createdAt)}
+            </p>
           </div>
         </div>
 
         {reserva.observacoes && (
           <div className="mb-4">
             <p className="text-sm text-gray-600 mb-1">Observações</p>
-            <p className="text-sm bg-gray-50 p-2 rounded">{reserva.observacoes}</p>
+            <p className="text-sm bg-gray-50 p-2 rounded">
+              {reserva.observacoes}
+            </p>
           </div>
         )}
 
@@ -158,9 +200,11 @@ export default function GerenciarReservas() {
             <label className="text-sm font-medium text-gray-700 mb-1 block">
               Alterar Status:
             </label>
-            <Select 
-              value={reserva.status?.toString().toUpperCase()} 
-              onValueChange={(newStatus) => handleStatusChange(reserva.id, newStatus)}
+            <Select
+              value={reserva.status?.toString().toUpperCase()}
+              onValueChange={(newStatus) =>
+                handleStatusChange(reserva.id, newStatus)
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Selecione o status" />
@@ -211,7 +255,9 @@ export default function GerenciarReservas() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-green-800 mb-2">Gerenciar Reservas</h1>
+        <h1 className="text-3xl font-bold text-green-800 mb-2">
+          Gerenciar Reservas
+        </h1>
         <p className="text-gray-600">Administre todas as reservas do sistema</p>
       </div>
 
@@ -225,24 +271,26 @@ export default function GerenciarReservas() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="pendentes" className="flex items-center gap-2">
             <Clock className="w-4 h-4" />
-            Pendentes ({filterReservasByStatus('PENDENTE').length})
+            Pendentes ({filterReservasByStatus("PENDENTE").length})
           </TabsTrigger>
           <TabsTrigger value="confirmadas" className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4" />
-            Confirmadas ({filterReservasByStatus('CONFIRMADA').length})
+            Confirmadas ({filterReservasByStatus("CONFIRMADA").length})
           </TabsTrigger>
           <TabsTrigger value="canceladas" className="flex items-center gap-2">
             <XCircle className="w-4 h-4" />
-            Canceladas ({filterReservasByStatus('CANCELADA').length})
+            Canceladas ({filterReservasByStatus("CANCELADA").length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="pendentes" className="mt-6">
           <div className="mb-4">
-            <h2 className="text-xl font-semibold text-yellow-700">Reservas Pendentes</h2>
+            <h2 className="text-xl font-semibold text-yellow-700">
+              Reservas Pendentes
+            </h2>
             <p className="text-gray-600">Reservas aguardando aprovação</p>
           </div>
-          {filterReservasByStatus('PENDENTE').length === 0 ? (
+          {filterReservasByStatus("PENDENTE").length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center">
                 <Clock className="w-12 h-12 mx-auto text-gray-400 mb-4" />
@@ -250,7 +298,7 @@ export default function GerenciarReservas() {
               </CardContent>
             </Card>
           ) : (
-            filterReservasByStatus('PENDENTE').map(reserva => (
+            filterReservasByStatus("PENDENTE").map((reserva) => (
               <ReservaCard key={reserva.id} reserva={reserva} />
             ))
           )}
@@ -258,10 +306,12 @@ export default function GerenciarReservas() {
 
         <TabsContent value="confirmadas" className="mt-6">
           <div className="mb-4">
-            <h2 className="text-xl font-semibold text-green-700">Reservas Confirmadas</h2>
+            <h2 className="text-xl font-semibold text-green-700">
+              Reservas Confirmadas
+            </h2>
             <p className="text-gray-600">Reservas aprovadas e ativas</p>
           </div>
-          {filterReservasByStatus('CONFIRMADA').length === 0 ? (
+          {filterReservasByStatus("CONFIRMADA").length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center">
                 <CheckCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />
@@ -269,7 +319,7 @@ export default function GerenciarReservas() {
               </CardContent>
             </Card>
           ) : (
-            filterReservasByStatus('CONFIRMADA').map(reserva => (
+            filterReservasByStatus("CONFIRMADA").map((reserva) => (
               <ReservaCard key={reserva.id} reserva={reserva} />
             ))
           )}
@@ -277,10 +327,12 @@ export default function GerenciarReservas() {
 
         <TabsContent value="canceladas" className="mt-6">
           <div className="mb-4">
-            <h2 className="text-xl font-semibold text-red-700">Reservas Canceladas</h2>
+            <h2 className="text-xl font-semibold text-red-700">
+              Reservas Canceladas
+            </h2>
             <p className="text-gray-600">Reservas que foram canceladas</p>
           </div>
-          {filterReservasByStatus('CANCELADA').length === 0 ? (
+          {filterReservasByStatus("CANCELADA").length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center">
                 <XCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />
@@ -288,7 +340,7 @@ export default function GerenciarReservas() {
               </CardContent>
             </Card>
           ) : (
-            filterReservasByStatus('CANCELADA').map(reserva => (
+            filterReservasByStatus("CANCELADA").map((reserva) => (
               <ReservaCard key={reserva.id} reserva={reserva} />
             ))
           )}

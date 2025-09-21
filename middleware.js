@@ -1,4 +1,4 @@
-import { withAuth } from "next-auth/middleware"
+import { withAuth } from "next-auth/middleware";
 
 export default withAuth(
   function middleware(req) {
@@ -9,14 +9,14 @@ export default withAuth(
       authorized: ({ token, req }) => {
         // Permitir acesso às rotas admin apenas para usuários autenticados
         if (req.nextUrl.pathname.startsWith("/admin")) {
-          return token?.role === "admin"
+          return token?.role === "admin";
         }
-        return true
-      },
-    },
+        return true;
+      }
+    }
   }
-)
+);
 
 export const config = {
   matcher: ["/admin/:path*"]
-}
+};

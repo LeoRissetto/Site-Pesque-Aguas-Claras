@@ -1,5 +1,5 @@
 // Cliente base para comunicação com API NestJS
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 class ApiClient {
   constructor() {
@@ -8,21 +8,21 @@ class ApiClient {
 
   async request(endpoint, options = {}) {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
+        "Content-Type": "application/json",
+        ...options.headers
       },
-      ...options,
+      ...options
     };
 
     try {
       const response = await fetch(url, config);
-      
+
       if (!response.ok) {
         let errorMessage = `HTTP error! status: ${response.status}`;
-        
+
         // Tentar capturar mensagem de erro do servidor
         try {
           const errorData = await response.json();
@@ -43,7 +43,7 @@ class ApiClient {
             // Ignora erro de texto
           }
         }
-        
+
         throw new Error(errorMessage);
       }
 
@@ -55,43 +55,43 @@ class ApiClient {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('API Request Error:', error);
-      console.error('URL:', url);
-      console.error('Config:', config);
+      console.error("API Request Error:", error);
+      console.error("URL:", url);
+      console.error("Config:", config);
       throw error;
     }
   }
 
   async get(endpoint) {
     return this.request(endpoint, {
-      method: 'GET',
+      method: "GET"
     });
   }
 
   async post(endpoint, data) {
     return this.request(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
+      method: "POST",
+      body: JSON.stringify(data)
     });
   }
 
   async put(endpoint, data) {
     return this.request(endpoint, {
-      method: 'PUT',
-      body: JSON.stringify(data),
+      method: "PUT",
+      body: JSON.stringify(data)
     });
   }
 
   async patch(endpoint, data) {
     return this.request(endpoint, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
+      method: "PATCH",
+      body: JSON.stringify(data)
     });
   }
 
   async delete(endpoint) {
     return this.request(endpoint, {
-      method: 'DELETE',
+      method: "DELETE"
     });
   }
 }

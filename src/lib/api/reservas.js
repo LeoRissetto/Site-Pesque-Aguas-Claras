@@ -1,9 +1,9 @@
-import { apiClient } from './client.js';
+import { apiClient } from "./client.js";
 
 export const reservasApi = {
   // Buscar todas as reservas
   async getAll() {
-    return await apiClient.get('/reservas');
+    return await apiClient.get("/reservas");
   },
 
   // Buscar reserva por ID
@@ -13,7 +13,7 @@ export const reservasApi = {
 
   // Criar nova reserva (endpoint público para o formulário do site)
   async create(data) {
-    return await apiClient.post('/reservas', data);
+    return await apiClient.post("/reservas", data);
   },
 
   // Atualizar reserva
@@ -43,6 +43,8 @@ export const reservasApi = {
 
   // Verificar disponibilidade
   async checkAvailability(churrasqueiraId, date, horario) {
-    return await apiClient.get(`/reservas/availability?churrasqueiraId=${churrasqueiraId}&date=${date}&horario=${horario}`);
+    return await apiClient.get(
+      `/reservas/availability?churrasqueiraId=${churrasqueiraId}&date=${date}&horario=${horario}`
+    );
   }
 };

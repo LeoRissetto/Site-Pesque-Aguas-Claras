@@ -1,9 +1,9 @@
-import { apiClient } from './client.js';
+import { apiClient } from "./client.js";
 
 export const mensagensApi = {
   // Buscar todas as mensagens
   async getAll() {
-    return await apiClient.get('/mensagens');
+    return await apiClient.get("/mensagens");
   },
 
   // Buscar mensagem por ID
@@ -13,7 +13,7 @@ export const mensagensApi = {
 
   // Criar nova mensagem (endpoint público para o formulário de contato)
   async create(data) {
-    return await apiClient.post('/mensagens', data);
+    return await apiClient.post("/mensagens", data);
   },
 
   // Marcar mensagem como lida
@@ -40,7 +40,7 @@ export const mensagensApi = {
 
   // Buscar mensagens não lidas
   async getUnread() {
-    return await apiClient.get('/mensagens?read=false');
+    return await apiClient.get("/mensagens?read=false");
   },
 
   // Buscar mensagens por status

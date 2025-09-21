@@ -2,15 +2,27 @@ import { withAuth } from "next-auth/middleware";
 
 export default withAuth(
   function middleware(req) {
-    // Middleware adicional se necessário
+    // Log para debug em desenvolvimento
+    if (process.env.NODE_ENV === "development") {
+      console.log("Middleware:", req.nextUrl.pathname);
+    }
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        // Permitir acesso às rotas admin apenas para usuários autenticados
-        if (req.nextUrl.pathname.startsWith("/admin")) {
-          return token?.role === "admin";
+        const { pathname } = req.nextUrl;
+
+        // Sempre permitir acesso à página de login e APIs de auth
+        if (pathname === "/admin/login" || pathname.startsWith("/api/auth")) {
+          return true;
         }
+
+        // Para rotas admin protegidas
+        if (pathname.startsWith("/admin")) {
+          return !!token && token.role === "admin";
+        }
+
+        // Permitir todas as outras rotas públicas
         return true;
       }
     }
@@ -18,5 +30,10 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/admin/:path*"]
+  matcher: [
+    // Protege apenas as rotas admin (exceto login)
+    "/admin/((?!login).*)",
+    // Inclui a rota base /admin
+    "/admin"
+  ]
 };

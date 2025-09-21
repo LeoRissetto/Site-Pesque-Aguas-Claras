@@ -123,13 +123,13 @@ export default function GerenciarReservas() {
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
-    
+
     // Se é uma data no formato YYYY-MM-DD, tratar como local
     if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      const [year, month, day] = dateString.split('-');
+      const [year, month, day] = dateString.split("-");
       return new Date(year, month - 1, day).toLocaleDateString("pt-BR");
     }
-    
+
     // Para outros formatos (datetime), usar método padrão
     return new Date(dateString).toLocaleDateString("pt-BR");
   };

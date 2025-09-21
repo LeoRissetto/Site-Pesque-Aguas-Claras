@@ -30,6 +30,7 @@ import {
   Edit,
   Trash2
 } from "lucide-react";
+import { reservasApi } from "@/lib/api";
 
 export default function GerenciarReservas() {
   const [reservas, setReservas] = useState([]);
@@ -42,9 +43,7 @@ export default function GerenciarReservas() {
 
   const fetchReservas = async () => {
     try {
-      const response = await fetch("http://localhost:3001/reservas");
-      if (!response.ok) throw new Error("Erro ao carregar reservas");
-      const data = await response.json();
+      const data = await reservasApi.getAll();
       setReservas(data);
     } catch (err) {
       setError("Erro ao carregar reservas");
@@ -56,16 +55,7 @@ export default function GerenciarReservas() {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:3001/reservas/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ status: newStatus.toLowerCase() })
-      });
-
-      if (!response.ok) throw new Error(`Erro ao alterar status da reserva`);
-
+      await reservasApi.update(id, { status: newStatus.toLowerCase() });
       // Atualizar a lista de reservas
       await fetchReservas();
     } catch (err) {
@@ -81,12 +71,7 @@ export default function GerenciarReservas() {
       )
     ) {
       try {
-        const response = await fetch(`http://localhost:3001/reservas/${id}`, {
-          method: "DELETE"
-        });
-
-        if (!response.ok) throw new Error("Erro ao excluir reserva");
-
+        await reservasApi.delete(id);
         // Atualizar a lista de reservas
         await fetchReservas();
       } catch (err) {

@@ -23,6 +23,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import Link from "next/link";
+import { reservasApi } from "@/lib/api";
 
 export default function ReservasAdmin() {
   const { data: session, status } = useSession();
@@ -46,8 +47,7 @@ export default function ReservasAdmin() {
 
   const fetchReservas = async () => {
     try {
-      const response = await fetch("http://localhost:3001/reservas");
-      const data = await response.json();
+      const data = await reservasApi.getAll();
       setReservas(data);
     } catch (error) {
       console.error("Erro ao carregar reservas:", error);
@@ -63,12 +63,7 @@ export default function ReservasAdmin() {
       )
     ) {
       try {
-        const response = await fetch(`http://localhost:3001/reservas/${id}`, {
-          method: "DELETE"
-        });
-
-        if (!response.ok) throw new Error("Erro ao excluir reserva");
-
+        await reservasApi.delete(id);
         setReservas((prev) => prev.filter((r) => r.id !== id));
       } catch (error) {
         console.error("Erro ao excluir reserva:", error);
@@ -79,16 +74,7 @@ export default function ReservasAdmin() {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:3001/reservas/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-
-      if (!response.ok) throw new Error("Erro ao alterar status da reserva");
-
+      await reservasApi.update(id, { status: newStatus });
       // Atualizar a lista de reservas
       await fetchReservas();
     } catch (err) {
